@@ -58,6 +58,7 @@ public class WaveRequestServiceImpl implements RequestService {
 								
 							}catch(Exception e){
 								callback.onFailure(e);
+								delKeyDelta.put(keys.get(i), null);//consume
 							}
 							delKeyDelta.put(keys.get(i), null);//consume
 						}catch (Exception e) {

@@ -29,6 +29,8 @@ public class WaveVegaUtilsImpl implements VegaUtils {
 		this.messages = messages;
 		this.tracker = analytics.createTracker(analyticsId.getAnalyticsId());
 		this.views = views;
+		views.initViewsFeature();
+		messages.initMiniMessagesFeature();
 	}
 	@Override
 	public void adjustHeight(){
@@ -56,6 +58,16 @@ public class WaveVegaUtilsImpl implements VegaUtils {
 		
 	}
 	@Override
+	public String retrUserThumbnailUrl() {
+		if(wave != null && wave.getViewer() != null){
+			return wave.getViewer().getThumbnailUrl();
+		}else{
+			return "";
+		}
+		
+	}
+	
+	@Override
 	public String retrHostId(){
 		if(wave != null && wave.getHost() != null){
 			return wave.getHost().getId();
@@ -65,7 +77,14 @@ public class WaveVegaUtilsImpl implements VegaUtils {
 	}
 	@Override
 	public void alert(String msg) {
-		messages.alert(msg);
+		if("empty argument".equals(msg)){
+			alert("Timeout! Please retry the request.");
+		}else{
+			if(msg.length() > 200){
+				msg = msg.substring(0,200);
+			}
+			messages.alert(msg);
+		}
 		height.adjustHeight();
 	}	
 	@Override
@@ -109,11 +128,25 @@ public class WaveVegaUtilsImpl implements VegaUtils {
 	public void putToPrivateSate(String key, String value){
 		HashMap<String,String> delta = new HashMap<String, String>();
 		delta.put(key, value);
-		wave.getPrivateState().submitDelta(delta);
+		if(wave != null && wave.getPrivateState() != null){
+			wave.getPrivateState().submitDelta(delta);
+		}
+	}
+	@Override
+	public void putToState(String key, String value){
+		HashMap<String,String> delta = new HashMap<String, String>();
+		delta.put(key, value);
+		if(wave != null && wave.getState() != null){
+			wave.getPrivateState().submitDelta(delta);
+		}
 	}
 	@Override
 	public String retrFromPrivateSate(String key){
-		return wave.getPrivateState().get(key);
+		if(wave != null && wave.getPrivateState() != null){
+			return wave.getPrivateState().get(key);
+		}else{
+			return "";
+		}
 	}
 	@Override
 	public void requestNavigateTo(String view,String optParams){
@@ -121,7 +154,11 @@ public class WaveVegaUtilsImpl implements VegaUtils {
 	}
 	@Override
 	public String retrFromState(String key) {
-		return wave.getState().get(key);
+		if(wave != null && wave.getState() != null){
+			return wave.getState().get(key);
+		}else{
+			return "";
+		}
 	}
 	@Override
 	public void reportEvent(String eventName, String action, String label, int value) {
